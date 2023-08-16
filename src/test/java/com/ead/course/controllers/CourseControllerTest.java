@@ -1,48 +1,37 @@
 package com.ead.course.controllers;
 
 import com.ead.course.AbstractTest;
-import com.ead.course.enums.CourseLevel;
-import com.ead.course.enums.CourseStatus;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.ead.course.utils.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
 public class CourseControllerTest extends AbstractTest {
 
-    private static final LocalDateTime DATE = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     @Mock
     CourseService courseService;
     @InjectMocks
     CourseController controller;
-
-    private static CourseModel getCourseModel(UUID id) {
-        CourseModel courseModel = new CourseModel();
-        courseModel.setId(id);
-        courseModel.setCourseLevel(CourseLevel.BEGINNER);
-        courseModel.setCourseStatus(CourseStatus.INPROGRESS);
-        courseModel.setName("Spring Boot");
-        courseModel.setDescription("Course de Spring Boot");
-        courseModel.setImageUrl("https://image.url");
-        courseModel.setUserInstructor(UUID.randomUUID());
-        courseModel.setCreationDate(DATE);
-        courseModel.setLastUpdateDate(DATE);
-        return courseModel;
-    }
 
     @Override
     @Before
@@ -51,7 +40,7 @@ public class CourseControllerTest extends AbstractTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testSaveCourse() throws Exception {
         String uri = "/courses";
         CourseModel courseModel = getCourseModel(null);
         CourseModel expected = getCourseModel(UUID.randomUUID());
@@ -72,5 +61,33 @@ public class CourseControllerTest extends AbstractTest {
                 .ignoringFields("id", "userInstructor", "creationDate", "lastUpdateDate")
                 .isEqualTo(expected);
     }
+
+    @Test
+    public void testDeleteCourseHappyPath() throws Exception {
+        String uri = "/courses/" + STRMyUUID;
+        CourseModel savedCourse = getCourseModel(MyUUID);
+        when(courseService.findById(savedCourse.getId())).thenReturn(Optional.of(savedCourse));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(200, status);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(content, "Product is deleted successsfully");
+    }
+
+    @Test
+    public void testDeleteCourseCourseNotFound() throws Exception {
+        String uri = "/courses/" + STRMyUUID;
+        when(courseService.findById(MyUUID)).thenReturn(null);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(uri)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertEquals(404, status);
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(content, "Course Not Found.");
+    }
+
 
 }
