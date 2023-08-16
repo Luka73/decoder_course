@@ -16,19 +16,6 @@ import java.util.UUID;
 
 public class SpecificationTemplate {
 
-    @And({
-            @Spec(path = "courseLevel", spec = Equal.class),
-            @Spec(path = "courseStatus", spec = Equal.class),
-            @Spec(path = "name", spec = Like.class)
-    })
-    public interface CourseSpec extends Specification<CourseModel> { }
-
-    @Spec(path = "title", spec = Like.class)
-    public interface ModuleSpec extends Specification<ModuleModel> { }
-
-    @Spec(path = "title", spec = Like.class)
-    public interface LessonSpec extends Specification<LessonModel> { }
-
     public static Specification<ModuleModel> moduleCourseId(final UUID courseId) {
         return (root, query, cb) -> {
             query.distinct(true);
@@ -37,5 +24,21 @@ public class SpecificationTemplate {
             Expression<Collection<ModuleModel>> courseModules = course.get("modules");
             return cb.and(cb.equal(course.get("courseId"), courseId), cb.isMember(module, courseModules));
         };
+    }
+
+    @And({
+            @Spec(path = "courseLevel", spec = Equal.class),
+            @Spec(path = "courseStatus", spec = Equal.class),
+            @Spec(path = "name", spec = Like.class)
+    })
+    public interface CourseSpec extends Specification<CourseModel> {
+    }
+
+    @Spec(path = "title", spec = Like.class)
+    public interface ModuleSpec extends Specification<ModuleModel> {
+    }
+
+    @Spec(path = "title", spec = Like.class)
+    public interface LessonSpec extends Specification<LessonModel> {
     }
 }

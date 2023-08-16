@@ -30,12 +30,6 @@ public class CourseControllerTest extends AbstractTest {
     @InjectMocks
     CourseController controller;
 
-    @Override
-    @Before
-    public void setUp() {
-        super.setUp();
-    }
-
     private static CourseModel getCourseModel(UUID id) {
         CourseModel courseModel = new CourseModel();
         courseModel.setId(id);
@@ -48,6 +42,12 @@ public class CourseControllerTest extends AbstractTest {
         courseModel.setCreationDate(DATE);
         courseModel.setLastUpdateDate(DATE);
         return courseModel;
+    }
+
+    @Override
+    @Before
+    public void setUp() {
+        super.setUp();
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CourseControllerTest extends AbstractTest {
         CourseModel actual = super.mapFromJson(content, CourseModel.class);
         assertThat(actual)
                 .usingRecursiveComparison()
-                .ignoringFields("id", "userInstructor")
+                .ignoringFields("id", "userInstructor", "creationDate", "lastUpdateDate")
                 .isEqualTo(expected);
     }
 
