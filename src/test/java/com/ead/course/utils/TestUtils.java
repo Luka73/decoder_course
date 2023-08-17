@@ -31,8 +31,8 @@ public class TestUtils {
         return courseModel;
     }
 
-    public static CourseModel getFullCourseModel() {
-        CourseModel courseModel = getCourseModel(UUID.randomUUID());
+    public static CourseModel getFullCourseModel(UUID id) {
+        CourseModel courseModel = getCourseModel(id);
         ModuleModel moduleModel = getModuleModel(UUID.randomUUID());
         LessonModel lessonModel1 = getLessonModel(UUID.randomUUID());
         LessonModel lessonModel2 = getLessonModel(UUID.randomUUID());
